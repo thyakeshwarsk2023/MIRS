@@ -1,0 +1,15 @@
+streamlit
+pandas
+numpy
+plotly
+sentence-transformers
+scikit-learn
+joblib
+vaderSentiment
+openai
+torch
+torchvision
+transformers
+matplotlib
+trafilatura
+pypdf
