@@ -12,12 +12,12 @@ def _escape_html(text: str) -> str:
     )
 
 
-def _merge_spans(spans: list[tuple[int, int, str]]) -> list[tuple[int, int, str]]:
+def _merge_spans(spans: list) -> list:
     if not spans:
         return []
 
     ordered = sorted(spans, key=lambda x: (x[0], -(x[1] - x[0])))
-    merged: list[tuple[int, int, str]] = [ordered[0]]
+    merged = [ordered[0]]
 
     for start, end, phrase in ordered[1:]:
         prev_start, prev_end, prev_phrase = merged[-1]
@@ -30,7 +30,7 @@ def _merge_spans(spans: list[tuple[int, int, str]]) -> list[tuple[int, int, str]
     return merged
 
 
-def highlight_propaganda_text(text: str, matches: list[str]) -> str:
+def highlight_propaganda_text(text: str, matches: list) -> str:
     """
     Wrap detected rhetorical phrases in annotated spans with analyst explanations.
     """
@@ -38,10 +38,10 @@ def highlight_propaganda_text(text: str, matches: list[str]) -> str:
         return '<p class="mirs-article-body"></p>'
 
     if not matches:
-        return f'<p class="mirs-article-body">{_escape_html(text)}</p>'
+        return '<p class="mirs-article-body">' + _escape_html(text) + '</p>'
 
     text_lower = text.lower()
-    spans: list[tuple[int, int, str]] = []
+    spans = []
 
     for phrase in set(matches):
         phrase_lower = phrase.lower()
@@ -54,20 +54,26 @@ def highlight_propaganda_text(text: str, matches: list[str]) -> str:
             search_from = idx + 1
 
     merged = _merge_spans(spans)
-    parts: list[str] = []
+    parts = []
     cursor = 0
 
     for start, end, phrase in merged:
         parts.append(_escape_html(text[cursor:start]))
-        snippet = _escape_html(text[start:end])
+        snippet     = _escape_html(text[start:end])
         explanation = _escape_html(get_phrase_explanation(phrase))
-        label = _escape_html(phrase)
+        label       = _escape_html(phrase)
+
+        # Build span without nesting quotes inside f-string
         parts.append(
-            f'<span class="mirs-highlight" title="{explanation}" data-label="{label}">'
-            f"{snippet}<sup class="mirs-highlight-tag">⚠</sup></span>"
+            '<span class="mirs-highlight"'
+            ' title="' + explanation + '"'
+            ' data-label="' + label + '">'
+            + snippet
+            + '<sup class="mirs-highlight-tag">&#9888;</sup>'
+            + '</span>'
         )
         cursor = end
 
     parts.append(_escape_html(text[cursor:]))
     body = "".join(parts)
-    return f'<p class="mirs-article-body">{body}</p>'
+    return '<p class="mirs-article-body">' + body + '</p>'
