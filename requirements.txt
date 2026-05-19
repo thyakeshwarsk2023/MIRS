@@ -2,9 +2,11 @@ streamlit==1.45.1
 pandas==2.2.3
 numpy==1.26.4
 plotly==6.1.0
+
 sentence-transformers==2.7.0
-joblib==1.5.0
-scikit-learn==1.6.1S
+transformers==4.41.2
+
+scikit-learn==1.6.1
 joblib==1.5.0
 
 vaderSentiment==3.3.2
